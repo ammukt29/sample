@@ -1,0 +1,995 @@
+📑 Table of Contents
+Executive Summary ............................................................ 1
+
+1. Application Overview ....................................................... 2
+   1.1 Login Page ............................................................. 2
+   1.2 Home Page .............................................................. 3
+   1.3 Account Options ........................................................ 4
+       • About 
+       • Settings 
+       • Access Control
+
+2. Talk to Document – Application Flow ........................................ 5
+   2.1 Application Page Overview .............................................. 5
+   2.2 Data Preparation ....................................................... 6
+       • Pipeline Listing
+       • Create New Pipeline
+       • Cloud Storage Configuration
+       • Database Storage Configuration
+       • Review Pipeline
+       • Pipeline Submission
+   2.3 Experiment and Deploy .................................................. 10
+       • Chatbot Listing
+       • Create New Chatbot
+       • Chatbot Response Page
+       • Model Comparison
+       • Deploy Chatbot
+       • Deployment Confirmation
+   2.4 Deployed Application .................................................... 15
+       • Chatbot Execution View
+       • Chat History and Responses
+
+3. Talk to Data – Application Flow ............................................ 17
+   3.1 Application Page Overview .............................................. 17
+   3.2 Data Preparation ....................................................... 18
+       • Create New Pipeline
+       • Semantic Views vs Stage
+       • Review & Submit Pipeline
+   3.3 Experiment and Deploy .................................................. 22
+       • Chatbot Creation
+       • Response Views (Results / SQL / Visualization / Plan)
+       • Deploy Chatbot
+   3.4 Deployed Application .................................................... 26
+   3.5 Semantic View Creation Agent ............................................ 27
+       • SQL Script Generation
+
+4. Regulatory Audit Compliance ................................................ 29
+   4.1 Compliance Page ........................................................ 29
+   4.2 Create New Regulation .................................................. 30
+   4.3 Regulatory & Audit Agent ............................................... 31
+   4.4 Policy List and Mapping ................................................ 32
+   4.5 Approved Policies ...................................................... 33
+   4.6 Snowflake Mapping ....................................................... 34
+
+5. Lineage Graph .............................................................. 35
+   5.1 Lineage Graph Overview ................................................  35
+   5.2 Create Lineage Graph ................................................... 36
+   5.3 View Generated Graphs .................................................. 37
+   5.4 Export Lineage Graph ................................................... 38
+   5.5 User Access & Role Information ......................................... 39
+
+6. Registered Services ........................................................ 40
+   6.1 Registered Services Page ............................................... 40
+   6.2 Register New Service ................................................... 41
+   6.3 Upload SQL File ........................................................ 42
+   6.4 Deploy Service ......................................................... 43
+
+7. Application Performance & Monitoring ........................................ 44
+   7.1 User Metrics ........................................................... 44
+   7.2 Usage Trends ........................................................... 45
+   7.3 Token Usage ............................................................ 46
+   7.4 CSAT Scores ............................................................ 47
+   7.5 Adoption Rates ......................................................... 48
+   7.6 Latency Metrics ........................................................ 49
+
+8. Error Monitoring ........................................................... 50
+
+9. Cost Calculator ............................................................ 51
+
+10. Templates ................................................................ 52
+    10.1 Templates Page ....................................................... 52
+    10.2 Register New Template ................................................ 53
+
+11. Prompt Generator .......................................................... 54
+    11.1 Generator Interface .................................................. 54
+    11.2 Generate Prompt ...................................................... 55
+    11.3 Edit & Save Prompt ................................................... 56
+
+12. Folder Structure (Technical Architecture) .................................. 57
+    12.1 Architecture Overview ................................................ 57
+    12.2 Node Backend Structure ............................................... 58
+    12.3 React Frontend Structure ............................................. 60
+    12.4 Router (Nginx) ....................................................... 62
+    12.5 API Prefix Handling .................................................. 63
+    12.6 Snowflake Authentication Logic ........................................ 64
+    12.7 Dock erization Strategy ................................................ 66
+    12.8 Deployment Workflow ................................................... 67
+    12.9 Single-Service Architecture ........................................... 68
+    13.0 System Workflow After Deployment ...................................... 69 
+
+EXECUTIVE SUMMARY-
+This document is an end-to-end walkthrough of the AI Scalability Platform application starting from the Home page: it explains how the React frontend initializes and issues API calls, how the Node/Express backend server.js and controllers) handles those requests and interacts with Snowflake, and how responses propagate back to update the UI. It highlights key routes (pipelines, analytics, templates, SPCS), helper utilities, relevant DB tables, and step-by-step tracing guidance for mapping UI actions to SQL queries.
+1.	Open the Application:
+ 
+
+2.	Login Page:
+•	This is the login page of the application. User will have to enter their credentials to continue to the application.
+•	Data Entry:
+	Username: Enter your snowflake username
+	Password: Enter the correct snowflake password.
+•	Click on “Sign in” button
+
+•	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3.	Home Page
+•	This is the Home Page of the AI Scalability Platform which contains four option cards: “Talk to Document”, “Talk to Data”, “regulatory Audit Compliance” and “Lineage Graph”. It also shows the type of user privileges for the account at the right hand-side in the top bar.
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app
+•	API Calls:
+	chatbots: This API gives response for existing chatbots list.
+	pipeline: This API gives response for the existing pipelines.
+	current-user: This API fetches the current user of the application.
+	Prompts: This API gives response for the existing prompts.
+	current-role: This role represents the administrative privileges.
+	current-access: The current user’s effective permissions now of the request.
+•	Click on “account” icon at the right top of the page
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.	Options accounts:
+•	The user gets three options for accounts: “About”, “Settings” and “Access Control”.
+-	About: Gives the usage of the icon
+•	Click on “Settings”
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+5.	Settings page:
+•	We can change the configuration through the settings, such as updating the user email ID to receive error notifications. 
+•	Data Entry:
+-	Write a valid email address where the user wants the error notifications. Then click on save and send verification.
+•	 API Call:
+-	Update_procedure_email: This post API updates the mail and the notification for errors will be sent on this mail.
+
+•	Click on “Access Control”
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6.	Access Control Page
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/access-control
+•	This page manages all the accesses according to the roles of the user. Admin can change the privileges assigned to different users by modifying the access through checking the checkboxes and then click on “Save Permissions”. The new access will get updated.
+•	API Calls:
+-	current-access: Checks the current access of the user, if he has permissions to change the access.
+-	update: After clicking on save permission this API updates all the permissions according to the new changes made by the administrator.
+
+
+7.	Talk to Document: 
+•	Click on “Talk to document”
+8.	Application Page
+•	This is the Application page for the talk to document flow. Here, we have three options: “Data Preparation”, “Experiment and Deploy”, “Deployed Application”.
+-	Data Preparation: Contains all the pipelines and the options to select new pipelines.
+-	Experiment and Deploy: Contains the existing chatbots and user can also create new chatbot.
+-	Deployed Application: Contains the deployed chatbot from which user can ask answers as per user requirement.
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/application
+
+
+
+
+	Click on “Data Preparation”
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9.	Data Preparation page for talk to Document
+•	Contains existing pipeline and the user can create a new pipeline according to the requirements.
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/data-preparation
+•	API calls:
+-	pipelines: This API gives response for existing pipelines.
+•	Click on “Create new Pipeline”
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10.	Create Pipeline page for Talk to Document
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/create-pipeline
+•	Data Entry:
+-	Give a new pipeline name (name should be unique than existing pipeline).
+-	Select the preferred data storage type.
+
+ 
+
+11.	Create Pipeline page for Talk to Document (CLOUD STORAGE)
+
+•	Data Entry:
+-	Select the database.
+-	Select the schema present inside the selected database.
+-	Choose a file location.
+-	Select the pdf files inside the selected file location (Optional).
+-	Then, select the chunking method.
+-	Select the chunking size.
+-	Select the chunking overlap.
+•	API call:
+-	databases: This API gives response to the existing databases.
+-	schemas: This API gives response for the schema present in the selected database.
+-	stages:
+-	stage-files: Gives response for the files inside the stage.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+12.	Create Pipeline page for Talk to Document (Database storage)
+
+•	Data Entry:
+-	Select the database.
+-	Select the schema present inside the selected database.
+-	Select the tables present inside the schema accordingly (Multiple tables can be selected).
+-	Select the column inside the table.
+-	Select the attribute (Optional).
+•	API calls:
+-	databases: This API gives response to the existing databases.
+-	schemas: This API gives response for the schema present in the selected database.
+-	tables: This API gives response for the tables inside the schema.
+-	Columns: This API gives names of the columns of the selected table. 
+•	Click on “NEXT”
+
+13.	Review Pipeline page (Cloud Storage)
+o	Here, The user can review the pipeline configuration before creating the pipeline.
+o	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/review-pipeline
+•	API calls:
+-	run-chunking: This POST API chunks the available pdf data and saves it in table format (After clicking on “Submit”).
+-	Submit-pipeline: API saves the pipeline in backend (After clicking on “Submit”).
+
+
+14.	Review Pipeline page (Database)
+•	API calls:
+-	Create-search-service:
+-	Submit-pipeline: API saves the pipeline in backend (After clicking on “Submit”).
+
+15.	Pipeline successfully submitted page
+•	If the pipeline successfully gets submitted, then user will get this “Pipeline Submitted” response. Else, the page will throw an error message.
+
+	Click on “Application” from the menu bar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+16.	Application Page of Talk to document
+
+
+
+
+
+
+
+	Click on “Experiment and Deploy” card
+
+17.	Experimentation and Deploy page
+•	Contains all the existing chatbots in which the user can do configurations as well as ask questions through prompts and the user also gets the option to create a new Chatbot.
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/search-chatbot
+
+	Click on “Create new Chatbot” button
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+18.	Create new chatbot page
+•	In this page the user must fill all the necessary information and give a unique name to chatbot then only the chatbot can be created successfully.
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/experimentation
+•	Data Entry:
+-	Give a unique name to your chatbot by clicking on the edit option in the middle of the page
+-	Select pipeline in the right panel.
+-	Select the prompts you want to use.
+-	Select the models you want to have in your chatbot (Max 3 models).
+
+	Click on “Create chatbot” button
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+•	If the API successfully responds then the user will get the success message, else it will throw an error message.
+•	API calls:
+-	create: create API posts the chatbot configuration to the back end.
+-	chatbots: It calls the data of the chatbot created from the backend.
+•	After creating the chatbot the user can directly give a prompt as per his needs
+
+19.	Response of the chatbot
+•	This page shows the response generated by the models here we have the option to select between the three models which we chose for the chatbot. 
+•	API Calls:
+-	agent: This API gives the prompts to the selected models.
+-	chatbot-response: Generates response according to prompt.
+
+
+	Click on the “Model Comparison” option:
+
+20.	Model Comparison page
+•	The model comparison option shows you the responsiveness and correctness of the models you chose as per their responses. It displays the “Total Conversation”, “Success Rate (%)”, “Recommended Model”, “Metric vs Score per Model” and “CSAT by model”.
+•	 API Calls:
+-	avg-metrics: Gives the metrics vs score per model
+-	csat-scores: Generates the CSAT Score graph.
+-	Total-conversation: Gives the number of total conversations with chatbot.
+-	Success-rate: Calculates the success-rate of the models.
+	Click on “Deploy” button:
+
+21.	Deploy chatbot dialogue box
+•	After the user is satisfied with the responses and finalizes on a model which he thinks as appropriate for his task. He can choose the deploy the chatbot so that it can be used for future uses as well.
+•	Data Entry:
+-	Choose a model which gave the appropriate response for your prompts.
+-	Choose the roles you want to give access of the chatbot. (Multiple roles can be selected).
+-	Default pipeline and prompts will be selected (which were used during the creation of the chatbot). If the user wants, he can change Pipeline and Prompt as well during deployment.
+o	API Calls:
+-	Roles: This API responds with the available roles.
+-	Pipelines: This API calls the available pipelines.
+-	Prompts: This API gets the available prompts in the pipeline.
+
+	Click on “Confirm Deployment” button
+
+22.	Chatbot successfully deployed dialogue box
+•	This confirmation message is generated when the chatbot has been successfully deployed and saved in the deployed application.
+•	API Calls:
+-	Deploy: This API posts the chatbot information in the database.
+	 Click on “Done” button
+23.	Deployed Application Page
+
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/deployed-application
+•	This page shows all the Deployed Applications that the user has deployed from the Experiment and Deploy option. The user can click on any of the application from the list to give prompts to.
+•	API calls:
+-	Deployments: This API gets all the available deployed applications from the database.
+	Click on any of the existing deployed applications:
+
+24.	Chatbot response page
+•	This page contains all the past chats and responses that has been generated by the chatbot.
+•	API Calls:
+-	models: Gets the model chosen during the deployment.
+-	response: This API gets the responses according to the prompts.
+-	history: This API gets the history of chats between the user and the chatbot.
+For Talk to Data:
+
+	Go the Home Page and select “Talk to Data”
+
+1.	Application Page for Talk to Data
+•	This is the Application Page for Talk to Data flow. Here, we have four options to choose from:
+-	Data Preparation: Contains all the pipelines and the options to select new pipelines.
+-	Experiment and Deploy: Contains the existing chatbots and user can also create new chatbot.
+-	Deployed Application: Contains the deployed chatbot from which user can ask answers as per user requirement.
+-	Semantic View Creation Agent: The semantic view can generate the SQL scripts based on facts, dimensions and metrics.
+	Click on “Data Preparation” card
+
+
+2.	Data Preparation page for talk to Data
+•	Contains existing pipeline and the user can create a new pipeline according to the requirements.
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/data-preparation
+•	API calls:
+-	pipelines: This API gives response for existing pipelines.
+
+	Click on “Create New Pipeline”
+3.	Create New Pipeline Page for Talk to Document
+
+If Stage is not selected - 
+
+If stage is selected - 
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/create-pipeline
+•	Data Entry:
+-	Provide a unique name for your pipeline
+-	Select the database.
+-	Select the schema present inside the selected database.
+-	Select the stage present inside the schema (If stage is selected then the user cannot select semantic view).
+-	Select either one or multiple semantic View (only if stage is not selected).
+-	Select the semantic model (only if stage is selected).
+•	API Calls:
+-	databases: This API gives response to the existing databases.
+-	schemas: This API gives response for the schema present in the selected database.
+-	stages:
+-	semantic-views: This API gets the semantic view options in the backend.
+-	semantic-models: This API gets the semantic models available in the stage.
+
+	Click on the “Next” button
+4.	Review Pipeline page for Talk to Data
+•	This page shows the configuration of the pipeline.
+	Click on the “Submit” button
+
+5.	Successful Submission dialogue
+•	This dialogue shows the pipeline was successfully submitted.
+•	API calls:
+-	Submit-pipeline: API saves the pipeline in backend (After clicking on “Submit”).
+-	If the pipeline successfully gets submitted, then user will get this “Pipeline Submitted” response. Else, the page will throw an error message.
+
+	Click on “Application” from the menu bar
+
+	Click on “Experiment and Deploy”:
+
+6.	Experiment and deploy page
+
+•	Contains all the existing chatbots in which the user can do configurations as well as ask questions through prompts and the user also gets the option to create a new Chatbot.
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/search-chatbot
+
+	Click on “Create new Chatbot” button
+
+
+
+7.	Create chatbot page for Talk to Data
+•	In this page the user must fill all the necessary information and give a unique name to chatbot then only the chatbot can be created successfully.
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/experimentation
+•	Data Entry:
+-	Give a unique name to your chatbot by clicking on the edit option in the middle of the page.
+-	Select pipeline in the right panel as per your need.
+
+	Click on “Create chatbot” button
+
+8.	Chatbot created successfully message
+•	If the API successfully responds then the user will get the success message, else it will throw an error message.
+•	API calls:
+-	create: create API posts the chatbot configuration to the back end.
+-	chatbots: It calls the data of the chatbot created from the backend.
+	After creating the chatbot the user can directly give a prompt as per his needs
+
+ 
+
+9.	Response of the chatbot
+•	This page shows the response generated by the chatbot and here after every response we also have options for “Results”, “SQL”, “Data Visualization” and “Plan”.
+•	API Calls:
+-	chatbot-response: Generates response according to prompt.
+
+10.	Deploy Chatbot dialogue box
+•	After the user is satisfied with the responses. He can choose the deploy the chatbot so that it can be used for future uses as well.
+•	Data Entry:
+-	Choose Semantic View/Model: Select the Semantic View/Model (The chosen pipeline must contain either semantic view or semantic model).
+-	Choose the roles you want to give access of the chatbot. (Multiple roles can be selected).
+-	Default pipeline will be selected (which were used during the creation of the chatbot). If the user wants, he can change Pipeline during deployment.
+•	API calls:
+-	Semantic-view: This API gets the semantic view from the pipeline
+-	Semantic-model: This API gets the semantic model from the pipeline.
+-	Roles: This API responds with the available roles.
+-	Pipelines: This API calls the available pipelines.
+
+	Click on “Confirm Deployment” button:
+11.	Chatbot successfully deployed dialogue box
+•	This confirmation message is generated when the chatbot has been successfully deployed and saved in the deployed application.
+•	API Calls:
+-	Deploy: This API posts the chatbot information in the database.
+	 Click on “Done” button
+12.	Deployed Application Page
+
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/deployed-application
+•	This page shows all the Deployed Applications that the user has deployed from the Experiment and Deploy option. The user can click on any of the application from the list to give prompts to.
+•	API calls:
+-	Deployments: This API gets all the available deployed applications from the database.
+
+	Click on any of the existing deployed applications:
+ 
+13.	Chatbot response page
+•	This page contains all the past chats and responses that has been generated by the chatbot.
+•	API Calls:
+-	response: This API gets the responses according to the prompts.
+-	history: This API gets the history of chats between the user and the chatbot.
+	Click on the “Application” option in the menu bar
+14.	Application page for Talk to Data
+	Click on the Semantic View Creation Agent
+ 
+15.	Semantic View Creation Page
+•	This page generates a SQL Script based on the tables.
+•	Data Entry:
+-	Give a name to the script.
+-	Choose the database.
+-	Choose the schema.
+-	Then, Choose the table needed for the script.
+•	API Calls:
+-	databases: This API gives response to the existing databases.
+-	schemas: This API gives response for the schema present in the selected database.
+-	tables: This API gets the Tables present inside the databse.
+•	Click on the “Generate Script” button:
+
+16.	Script is created
+•	API call:
+-	Semantic-model: Generates a SQL scripts according to the tables chosen.
+	Click on the “Home” button
+Regulatory Audit Compliance:
+
+1.	Regulatory & Audit Compliance
+•	URL: 
+•	The Compliance page lets users view, create, and link compliance regulations to pipelines. he page shows a list of regulations and their metadata, provides a form to create a new regulation (validates required fields), and enables attaching a regulation to a pipeline. The users can also open any existing compliance and review and download it as csv or pdf.
+•	API Call:
+-	compliances: This API returns the list of compliance regulations and their metadata.
+	Click on “Create new” button:
+
+2.	Regulatory and Audit Agent Page
+•	URL: 
+•	The Regulatory & Audit Agent page lets users run automated agents to generate or map compliance policies and audit checks.
+•	Data Entry:
+-	Compliance check name: Choose a name for the compliance
+-	Select compliance document pipeline: Choose an existing pipeline to source documents.
+-	Select regulations Type: Category filter for regulation classification.
+-	Inputs on controls to be extracted: free-text list or keywords that the agent should extract from documents.
+•	API Call:
+-	pipelines: This API gives response for the existing pipelines.
+
+	Click on the “Proceed to list policies”
+
+3.	Policy Scanner Page
+•	URL: 
+•	Runs automated policy scanning agents against a selected regulation or pipeline to extract candidate policies and suggested Snowflake target tables. Displays a table of Policy ID, description, auto generated target tables, suggested count and match score with per row edit and bulk select. Actions include regenerate policy SQL, edit/override mappings, save changes, and approve selected policies.
+•	API Call:
+-	create-compliance:  This API inserts a new regulation/compliance record into DIM_REGULATION.
+-	policies-from-agent: This API forwards a user prompt to the Snowflake policy agent to extract candidate policies.
+-	policies: Returns policies for a given regulationId.
+-	approvePolicies: Accepts body validates and extracts policy IDs, deduplicates them, and updates DIM_POLICY to set APPROVAL_STATUS = 'APPROVED' for the given IDs.
+	Click on “View Approved Policies”
+
+4.	Approved Policies Page
+•	Displays the list of approved policies for a selected compliance review.
+•	API Call:
+-	approved: This API returns the list of APPROVED policies for a supplied regulationId.
+	Click on “Generate Snowflake Mapping”
+
+5.	Snowflake Mapping Page
+•	Review and validate auto generated Snowflake target mappings for extracted policies, showing Policy ID, description, suggested target tables and suggested counts.
+•	API calls:
+-	mapping: Returns the list of mapped policies and target table/column information for a given regulationId.
+-	mapping_agent: Forwards a user prompt to the Snowflake mapping agent to generate mapping suggestions; returns the agent raw response and extracted text.
+	Click on “Proceed to Mapped policies”
+6.	List of Mapped Policies Page
+•	Displays mapped policies with columns: Policy ID, Policy description, Semantic view, Target database/schema/table/column, match score/reason, mapping ID and approval status.
+•	API Calls:
+-	mapping: Returns the list of mapped policies and target table/column information for a given regulationId.
+-	mapping_agent: Forwards a user prompt to the Snowflake mapping agent to generate mapping suggestions; returns the agent raw response and extracted text (When the user clicks on save).
+	 Click on “Proceed to Compliance Check” button
+7.	Compliance Check Results Page
+•	Shows compliance check results for a selected review with a table of Policy ID, policy description and the generated SQL that found non compliant records. Users can download report in excel format by clicking on “GENERATE REPORT” button.
+•	API Call:
+-	generated_sql: This API returns stored/generated compliance check logic rows for inspection or export.
+-	run-compliance: Triggers the compliance pipeline by calling Snowflake procedures then build excel file and downloads it.
+	Click on “Proceed to Remediation Script” button
+
+8.	Remediation Policy page
+•	Shows generated remediation scripts for selected compliance findings (logicId/policyId) with columns for generated SQL, source result, comments, and approval status.
+•	API Call:
+-	remediation: Fetches remediation candidates from DIM_COMPLIANCE_CHECK_LOGIC_REGENERATE.
+	Click on “Proceed to Remediation SQL”
+9.	Remediation SQL Logic Page
+•	Lists remediation logic entries (logicId, policyId, target table/column, generated SQL and source result) with approval status and timestamps.
+•	API Call:
+-	remediation: returns remediation candidates from DIM_COMPLIANCE_CHECK_LOGIC_REGENERATE.
+	Click on “Schedule Job”
+10.	Schedule Job dialogue box
+•	Modal dialog to schedule a compliance/remediation job: choose frequency and start/end date range and hit Confirm to create the scheduled task.
+
+	Click on “Confirm” button
+11.	Confirm message for Job Schedule
+•	Success modal confirming the compliance job was scheduled successfully.
+•	API Call:
+-	schedules: This API schedules a compliance job for a given regulationId by validating frequency and date range, inserting a JOB_SCHEDULES row and creating/resuming a Snowflake TASK.
+-	compliances: This API returns the list of compliance regulations and their metadata.(After clicking on “Ok”).
+
+	Click on the “Home” button
+
+Lineage Graph:
+ 
+1.	Lineage Graph Page
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/lineage-graph
+•	A lineage graph describes how data flows and transforms across objects, showing which table, views and qury depends on which sources.
+•	Data Entry:
+-	Enter a graph name.
+-	Choose a database.
+-	Choose the schema as per requirement.
+-	Choose the Object type (options: Both, Table and View).
+-	Choose the Object name (shows options as per object type).
+-	Choose direction of the lineage.
+-	Choose if you want to inclue the columns or not in the graph.
+-	Write the name of the column you want to include and distance.
+•	API call:
+-	database: This API gets the database from the backend.
+-	schemas: This API gets the schemas from the database.
+-	tables: This API gets the tables and it’s columns from the selected schema.
+-	views: This API gets the views in the schema.
+
+ 
+	Click on the “Generate” button:
+
+2.	Graph created successfully
+•	You can see all the generate graphs in the Generated graphs table below.
+•	API call:
+-	lineage: This API works on generating the lineage graph as per the requirements given.
+	Click on the “view” icon in the Action column of Generated Graphs table
+3.	Generated lineage graph page
+•	This page shows the Lineage graph and also gives the option to export the graph in .xls format.
+•	API call:
+-	lineage: This API creates the lineage graph from the backend stored data.
+-	current-user: This API fetches the current user.
+-	current-role: This API fetches the current role of the user.
+-	current-access: This API checks the access of the user.
+
+	Click on “Services” in the menu panel.
+4.	Registered Services Page
+
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/services
+•	This page shows the registred services available and also the contents of all services. Eg: “Name”, “Object type”, “Object Name”, “Description”, “Input Argument”, “Output Argument”.
+•	API Call:
+-	combined: This API gets all the services saved in the database.
+
+	Click on “Register Sevice” to register a new service.
+ 
+5.	Register New Service Page
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/services/register
+•	Id the user want to register new service then he can do this through the register service page.
+•	Data Entry:
+-	Service Name: Write the name of the service.
+-	Snowflake Object Type: Select the Object type.
+-	Write the name of the object.
+-	Write a discription for the service.
+-	Put an input argument from within the Stored Procedure.
+-	Give a Outputm argument.
+-	Upload the SQL File you want to use for the service.
+	Click on “Upload File” button
+6.	Success message after uploading the file
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/services/register
+•	This screen shows the SQL was file uploaded successfully.
+•	After uploading the file click on “Submit” button. A pop-up will appear for successfully registering the service.
+•	API Call:
+-	upload: This API uploads the selected sql file.
+-	services: This API registers the service.
+
+	After the service is successfully deployed the Registered Services page will open
+
+7.	Registered Services Page
+•	Now select the services user wants to deploy by clicking on the checkbox.
+	Click on the “Deploy Sevice” button
+8.	The pop-up after the service is deployed
+•	API Call:
+-	deploy: This API  posts the deployed service.
+	Click on “Monitoring” in the menu tab
+ 
+ 
+9.	Application performance and Monitoring Page
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/service-monitoring
+•	This page shows and monitors all the data of the application “Users”, “Conversations”, “Token Usage”, “Average Latency”, “CSAT (avg)”, “Adoption Rate”, “CSAT Score (Date-wise)”, “User usage trend”, “Token usage trend”. The page also provides the option to choose a specific application for monitoring and the user can select the range of dates as well.
+•	API Calls:
+-	total_user: This API gets the total number of users who used the application.
+-	total_usage: This API gets the total usage of the application.
+-	get_chatbots: This API gets the number of coversations from the chatbot.
+-	monthly_users: Gets the avrage monthly users.
+-	csat_graph: This API makes the CSAT graph per month.
+-	adoption_rate: This API gets the adoption rate percentage.
+-	total_conversations: Gets the total number of conversations per month.
+-	total_usage_by_month: This API gets the total number of users by month.
+-	average_latency: Gives the average latency of the application.
+-	csat: Generates the CSAT score (avg).
+	Click on “Error” in the menu tab
+Error Monitoring Page:
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/error
+•	This page monitors and shows all the error thrown by the application inculing the “Event Type”, “Error Message”, “Context” and “Date”. The user can also select the type of error and the timeline for which he wants the error.
+•	API calls:
+-	event_types: This API gets all the error types generated by the application.
+-	error-dashboard: creates graphical representation of the errors.
+-	notify-failed-audits: This API mails all the errors that happens in the application.
+	Click on “Cost Calculator” in the menu tab
+Cost Calculator Page:
+•	This page shows the cost calculation for running the application. The user can also select the application, currency and timepline for the cost calculation.
+•	API calls:
+-	cost-trend: This API returns Returns a time series of allocated Snowflake credit usage and cost (USD) for Snowpark Container Services.
+-	total-cost: This API gets total cost for owner services or a specific name.
+-	distribution: This API gets cost distribution across services.
+	Click on “Templates” in the menu tab
+
+Templates Page
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/templates
+•	This page contains all the Templates and it’s description as well as the uage of the templates. The user can also add new templates.
+•	API call:
+-	templates: The get templates API manages reusable templates used by the frontend.
+	Click on “Register New Template”
+
+1.	Register New template dialogue box
+•	If the user wants to register a new template for any of the functions of the application he can use this.
+•	Data Entry:
+-	Give the name of the template.
+-	Give the description of the template.
+•	API Calls:
+-	templates: This post API sends the new template’s description to the backend.
+	Click on “Prompt Generator” in the menu tab
+ 
+ 
+ 
+Prompt Generator Page:
+•	URL: https://jgdedud-pihjdmo-capgemini-apac-poc.snowflakecomputing.app/prompt-generator
+•	The prompt generator page contains all the custom saved prompts made by the user for various use cases (you can see the saved prompts by clicking on view saved prompts).
+•	Data Entry:
+-	Enter the domain for which user wants the propmt to be.
+-	Choose whether the propt will be zero shot or one shot.
+-	Write a description for the prompt so the other users can understand what the prompt is about.
+•	API calls:
+-	prompts: This API gets the saved prompts from the database.
+
+	Click on “Generate prompt”
+1.	Successfully generated the prompt message
+•	After the prompt is successfully generated this page will appear which contains the prompt contents.
+•	Data Entry:
+-	The user can also make changes to the prompt contents.
+-	Enter a unique name for the the prompt.
+•	API call:
+-	generate-prompts: This post API generates the prompt on the basis of the domain and information provided.
+	Click on “Save prompt” button
+
+
+
+
+
+
+
+
+2.	Prompt saved successfully message
+•	The prompt will be saved in the database and can be now accessed in the scenarios when it is required.
+•	API Call:
+-	save-prompt: This post API saves the prompt data in the database.
+ 
+Folder Structure
+Overview
+This project is a full‑stack application deployed on Snowflake Snowpark Container Services (SPCS). It contains three independent components—React Frontend, Node.js Backend, and Nginx Router—which are deployed together inside a single Snowflake service because cross‑service networking is restricted and OAuth identity forwarding only works reliably when all containers run inside the same service.
+Project Structure
+The repository contains three main folders: react/, node/, and router/. Each component has its own Dockerfile, and all are built into separate container images. These images are deployed together in a single Snowflake service.
+📂 node
+📂 node/config/
+Contains configuration files such as:
+•	Database connection configuration
+•	Environment based settings
+•	Constants used across backend
+📂 node/controllers/
+Holds controller logic for each API endpoint.
+Example responsibilities:
+•	Processing requests
+•	Running business logic
+•	Returning responses to the frontend
+📂 node/routes/
+Defines all backend API routes.
+Follows environment based prefix strategy:
+•	/api/... in local development
+•	/... in deployment
+📂 node/docs/
+Backend-specific documentation (API specs, design notes, etc.).
+📂 node/node_modules/
+Auto generated by npm. Contains all backend dependencies.
+📄 .env (inside node/)
+Environment variables for backend
+(e.g., DB credentials, ports, Snowflake configs).
+📄 server.js
+Main entry point of backend.
+Responsible for:
+•	Loading env config
+•	Setting API prefix (local vs deployment)
+•	Registering routes
+•	Starting Express server
+📄 package.json / package-lock.json
+Backend dependencies, scripts, and metadata.
+📄 snowflake.log
+Logs related to Snowflake integration (if enabled).
+ 
+________________________________________
+📂  react
+react/ – Frontend (React + Vite)
+Handles UI rendering, API consumption, RBAC display logic, and user interactions.
+📂 react/src/
+Core application source code:
+•	Components
+•	Pages
+•	Hooks
+•	Services (API calls)
+•	State management
+📂 react/public/
+Static files served as-is (logos, manifest, icons).
+📂 react/dist/
+Production build output generated by vite build.
+📂 react/docs/
+Frontend documentation (UI flows, wireframes).
+📂 react/node_modules/
+Auto-generated frontend dependencies.
+📄 .env
+Frontend environment variables (e.g., API base URL).
+📄 index.html
+Root HTML template loaded by Vite.
+📄 vite.config.ts
+Vite configuration (dev server, proxies, build options).
+📄 tsconfig.*.json
+TypeScript configuration files for compiler rules.
+📄 .prettierrc / .eslintrc.js
+Code formatting and linting rules for frontend.
+ 
+________________________________________
+📂 router
+router/ – Deployment Router (Nginx Configuration)
+Used only during deployment (Snowflake SPCS reverse proxy setup).
+ 
+
+Router (Nginx) Configuration
+The Nginx router serves the React UI and forwards backend API requests. In deployment, it removes the `/api` prefix before forwarding requests to the backend because the backend does not internally use the `/api` prefix.
+
+Router Configuration
+events {
+  worker_connections 1024;
+}
+http {
+    server {
+        listen 8080;
+        listen [::]:8080;
+        server_name localhost;
+        location / { proxy_pass http://$FRONTEND_URL/; }
+        location /api { rewrite /api/(.*) /$1 break; proxy_pass http://$BACKEND_URL/; }
+    }
+}
+
+Frontend API Calls
+The frontend must always call backend API endpoints using the `/api` prefix. Example: `/api/getData`. This is required so that the router can correctly forward traffic to the backend.
+
+ Important Note: Local vs Deployment API Prefix Behaviour
+To ensure smooth development and deployment of the React + Node.js application, a consistent API access pattern is required:
+•	Frontend (React) should always call APIs using the /api/... prefix
+•	Backend (Node.js) should: 
+o	Accept /api/... routes locally
+o	Accept non prefixed routes (e.g., /data) in deployment
+This difference is necessary because Nginx strips the /api prefix when deployed.
+Therefore, the backend must dynamically adjust its route prefix based on the environment.
+
+Required Behaviour
+
+Local Development
+Component	API Path Used
+Frontend	/api/data
+Backend	/api/data
+React and Node run separately → direct access to /api/...
+
+Deployed Application:
+Deployment
+Component	API Path Used	Notes
+Frontend	/api/data	No change required
+Nginx Router	rewrites /api/data → /data	Removes /api prefix
+Backend	/data	Must NOT include /api
+
+Backend Snowflake Connection Logic
+The backend automatically switches between two authentication modes: OAuth token (inside SPCS) and username/password (local environment).
+ 
+
+Dockerization Strategy
+Three Docker images—react, node, router—are built independently and then pushed to Snowflake using Snow CLI. The images are hosted inside Snowflake's Image Repository.
+React
+ 
+Node
+ 
+Router
+ 
+
+Deployment Workflow
+Deployment steps:
+1. Upload code to S3
+2. Sync S3 → EC2
+3. Build Docker images
+4. Authenticate using Snow CLI
+5. Push images to Snowflake
+6. Create a single Snowflake service with all 3 containers
+7. Get the public endpoint link
+
+Single Service Architecture
+All three components must run inside a single service because:
+- Snowflake restricts cross‑service communication
+- Internal routing would fail across separate services
+- OAuth identity forwarding works only within a unified service
+Thus, single service deployment is mandatory for stable communication.
+ 
+And get the endpoints for the deployed app
+      show endpoints in  service raise_app;
+ 
+
+ System Workflow After Deployment
+User → Router → React → /api → Router → Backend → Snowflake → Backend → React. The backend executes SQL using the user's Snowflake identity.
